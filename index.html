@@ -5,18 +5,9 @@
 <title>HAHA Checker</title>
 
 <style>
-/* RESET */
 * { box-sizing: border-box; }
+canvas { position: fixed; top: 0; left: 0; z-index: -1; }
 
-/* MATRIX BACKGROUND */
-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: -1;
-}
-
-/* BODY */
 body {
   margin: 0;
   background: black;
@@ -41,7 +32,7 @@ body {
   color: #888;
 }
 
-/* MAIN BOX */
+/* BOX */
 .box {
   max-width: 880px;
   margin: 40px auto;
@@ -52,7 +43,6 @@ body {
   backdrop-filter: blur(3px);
 }
 
-/* INPUT / BUTTON */
 input {
   width: 100%;
   padding: 12px;
@@ -62,6 +52,7 @@ input {
   color: #0f0;
   font-size: 14px;
 }
+
 button {
   margin-top: 15px;
   padding: 10px 22px;
@@ -71,11 +62,8 @@ button {
   font-weight: bold;
   color: black;
 }
-button:hover {
-  background: #ff4444;
-}
+button:hover { background: #ff4444; }
 
-/* OUTPUT */
 pre {
   margin-top: 20px;
   background: black;
@@ -85,24 +73,20 @@ pre {
   color: #0f0;
 }
 
-/* HIDE */
 .hidden { display: none; }
 
-/* DISCORD */
+/* DISCORD LINK */
 .discord {
   text-align: center;
-  margin-top: 25px;
+  margin-top: 22px;
   cursor: pointer;
 }
 .discord img {
-  width: 46px;
+  width: 42px;
   opacity: 0.9;
 }
-.discord:hover img {
-  opacity: 1;
-}
+.discord:hover img { opacity: 1; }
 
-/* FOOTER */
 .footer {
   text-align: center;
   margin: 18px 0;
@@ -123,10 +107,16 @@ pre {
 
 <!-- LOGIN -->
 <div class="box" id="loginBox">
-  <h3>ACCESS KEY</h3>
+  <h3>HAHA CHECKER ACCESS</h3>
   <input id="keyInput" placeholder="Enter key">
   <button onclick="checkKey()">LOGIN</button>
   <pre id="keyStatus">Awaiting authorization...</pre>
+
+  <!-- DISCORD UNDER KEY -->
+  <div class="discord" onclick="joinDiscord()">
+    <img src="https://cdn-icons-png.flaticon.com/512/2111/2111370.png">
+    <div>discord.gg/hahaa</div>
+  </div>
 </div>
 
 <!-- PANEL -->
@@ -145,84 +135,63 @@ pre {
 <div class="footer">© HAHA Checker</div>
 
 <script>
-/* ========= MATRIX ANIMATION ========= */
+/* MATRIX */
 const canvas = document.getElementById("matrix");
 const ctx = canvas.getContext("2d");
+function resize(){ canvas.width=innerWidth; canvas.height=innerHeight; }
+resize(); addEventListener("resize", resize);
 
-function resize() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-resize();
-window.addEventListener("resize", resize);
+const chars="01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&@";
+const size=14; let cols=Math.floor(innerWidth/size);
+let drops=Array(cols).fill(1);
 
-const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&@";
-const fontSize = 14;
-let columns = Math.floor(canvas.width / fontSize);
-let drops = Array(columns).fill(1);
-
-function drawMatrix() {
-  ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  ctx.fillStyle = "#0f0";
-  ctx.font = fontSize + "px Consolas";
-
-  for (let i = 0; i < drops.length; i++) {
-    const text = letters[Math.floor(Math.random() * letters.length)];
-    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-      drops[i] = 0;
-    }
+setInterval(()=>{
+  ctx.fillStyle="rgba(0,0,0,0.08)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="#0f0";
+  ctx.font=size+"px Consolas";
+  for(let i=0;i<drops.length;i++){
+    const t=chars[Math.floor(Math.random()*chars.length)];
+    ctx.fillText(t,i*size,drops[i]*size);
+    if(drops[i]*size>canvas.height && Math.random()>0.975) drops[i]=0;
     drops[i]++;
   }
-}
-setInterval(drawMatrix, 33);
+},33);
 
-/* ========= PANEL LOGIC ========= */
-const VALID_KEY = "hahaxoogway";
+/* PANEL LOGIC */
+const VALID_KEY="hahaxoogway";
 
-function checkKey() {
-  const key = document.getElementById("keyInput").value.trim();
-  if (key === VALID_KEY) {
-    document.getElementById("loginBox").classList.add("hidden");
-    document.getElementById("panelBox").classList.remove("hidden");
-  } else {
-    document.getElementById("keyStatus").innerText = "ACCESS DENIED";
-  }
+function checkKey(){
+  const k=keyInput.value.trim();
+  if(k===VALID_KEY){
+    loginBox.classList.add("hidden");
+    panelBox.classList.remove("hidden");
+  } else keyStatus.innerText="ACCESS DENIED";
 }
 
-function randomMail() {
-  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-  let name = "";
-  for (let i = 0; i < 10; i++) {
-    name += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return name + "@gmail.com";
+function randomMail(){
+  const c="abcdefghijklmnopqrstuvwxyz0123456789";
+  let n=""; for(let i=0;i<10;i++) n+=c[Math.random()*c.length|0];
+  return n+"@gmail.com";
 }
 
-function lookup() {
-  const id = document.getElementById("discordId").value.trim();
-  if (!id) {
-    document.getElementById("result").innerText = "No ID provided.";
-    return;
-  }
-
-  document.getElementById("result").innerText = "Scanning...";
-  setTimeout(() => {
-    document.getElementById("result").innerText =
+function lookup(){
+  const id=discordId.value.trim();
+  if(!id){ result.innerText="No ID provided."; return; }
+  result.innerText="Scanning...";
+  setTimeout(()=>{
+    result.innerText=
 `QUERY RESULT
 ------------------------
 Discord ID : ${id}
 Email      : ${randomMail()}
 Status     : FOUND
 Confidence : HIGH`;
-  }, 900);
+  },900);
 }
 
-function joinDiscord() {
-  window.open("https://discord.gg/hahaa", "_blank");
+function joinDiscord(){
+  open("https://discord.gg/hahaa","_blank");
 }
 </script>
 
